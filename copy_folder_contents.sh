@@ -9,8 +9,8 @@ cd "$FOLDER_PATH" || exit 1
 echo "FOLDER_PATH: $FOLDER_PATH" >> /tmp/copy_folder_contents.log
 
 # ===== EXCLUSIONS CONFIGURATION - MODIFY THESE =====
-EXCLUDE_DIRS=(".git" ".vscode" "node_modules" "__pycache__" ".idea" "dist" "build" ".next", "gpt_env")
-EXCLUDE_FILES=("package-lock.json" "yarn.lock" ".DS_Store" "*.pyc" ".env" ".env.*" "*.min.js" "*.log" "pnpm-lock.yaml", "*.txt")
+EXCLUDE_DIRS=(".git" ".vscode" "node_modules" "__pycache__" ".idea" "dist" "build" ".next", "gpt_env", "*/venv/", ".eslintignore", ".eslintrc.js")
+EXCLUDE_FILES=("package-lock.json" "yarn.lock" ".DS_Store" "*.pyc" ".env" ".env.*" "*.min.js" "*.log" "pnpm-lock.yaml", "*.txt", "package.json", ".gitignore", "*.wav")
 # ===================================================
 
 # Build find command using arrays (safer)
@@ -45,27 +45,27 @@ while IFS= read -r -d '' file; do
   rel_path="${file#./}"
   echo "Processing: $rel_path"
   echo "Processing $rel_path" >> /tmp/copy_folder_contents.log
-  
+
   # Skip unreadable/empty files
   if [[ ! -r "$file" ]]; then
     echo "  Skipping: Not readable"
     echo "$file Skipping: Not readable" >> /tmp/copy_folder_contents.log
     continue
   fi
-  
+
   if [[ ! -s "$file" ]]; then
     echo "  Skipping: Empty file"
     echo "$file Skipping: Empty file" >> /tmp/copy_folder_contents.log
     continue
   fi
-  
+
   # Try to detect binary files
   if file "$file" | grep -q "binary"; then
     echo "$file Skipping: Binary file" >> /tmp/copy_folder_contents.log
     echo "  Skipping: Binary file"
     continue
   fi
-  
+
   # Add file header and content
   output+="--- $rel_path ---"$'\n'
   if content=$(cat -- "$file" 2>/dev/null); then
